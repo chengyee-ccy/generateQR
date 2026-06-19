@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HD QR Code Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input, select {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #qrcode {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>HD QR Code Generator (Print Quality)</h2>
+
+  <div>
+    <input type="text" id="linkInput" placeholder="Enter your link here" />
+  </div>
+
+  <div>
+    <label>Size:</label>
+    <select id="size">
+      <option value="512">512 x 512</option>
+      <option value="1024" selected>1024 x 1024 (Recommended)</option>
+      <option value="2048">2048 x 2048 (Ultra HD)</option>
+    </select>
+  </div>
+
+  <button onclick="generateQR()">Generate HD QR</button>
+
+  <div id="qrcode"></div>
+
+  <script>
+    function generateQR() {
+      const link = document.getElementById("linkInput").value;
+      const size = parseInt(document.getElementById("size").value);
+      const qrContainer = document.getElementById("qrcode");
+
+      qrContainer.innerHTML = "";
+
+      if (!link) {
+        alert("Please enter a link");
+        return;
+      }
+
+      // Create temporary container
+      const tempDiv = document.createElement("div");
+
+      // Generate QR code (canvas-based)
+      new QRCode(tempDiv, {
+        text: link,
+        width: size,
+        height: size,
+        correctLevel: QRCode.CorrectLevel.H // high error correction
+      });
+
+      setTimeout(() => {
+        const canvas = tempDiv.querySelector("canvas");
+
+        if (canvas) {
+          // Show preview (scaled down)
+          const preview = canvas.cloneNode(true);
+          preview.style.width = "200px";
+          preview.style.height = "200px";
+          qrContainer.appendChild(preview);
+
+          // Download HD PNG
+          const dataUrl = canvas.toDataURL("image/png");
+
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = "qr_hd.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      }, 300);
+    }
+  </script>
+
+</body>
+</html>
